@@ -1,5 +1,12 @@
 package org.example.cabeceros;
 
+/*
+ * Clase Producto
+ * Autores: Erick Sanguña,Ian Morales,Jesus Viera
+ *
+ * Fecha: 06/11/2025
+ */
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,11 +19,18 @@ import java.util.Enumeration;
 
 @WebServlet("/cabeceros-request")
 public class CabecerasHttpRequestServlet extends HttpServlet {
+    /*
+     * Maneja las peticiones GET mostrando información del request HTTP:
+     * metodo, URI, URL, contexto, servlet, IP remota, puerto y cabeceras.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        // Se establece el tipo de contenido como HTML con codificación UTF-8
         resp.setContentType("text/html;charset=UTF-8");
+
+        // Se obtienen datos de la petición HTTP
         String metodoHttp = req.getMethod();
         String requestURI = req.getRequestURI();
         String requestURL = req.getRequestURL().toString();
@@ -25,6 +39,7 @@ public class CabecerasHttpRequestServlet extends HttpServlet {
         String ip = req.getRemoteAddr();
         int port = req.getServerPort();
 
+        // Generación del contenido HTML
         try (PrintWriter out = resp.getWriter()) {
             out.println("<!DOCTYPE html>");
             out.println("<html lang='es'>");
@@ -42,6 +57,8 @@ public class CabecerasHttpRequestServlet extends HttpServlet {
             out.println("<li>Servlet: " + servletPath + "</li>");
             out.println("<li>IP Remota: " + ip + "</li>");
             out.println("<li>Puerto: " + port + "</li>");
+
+            // Se listan todas las cabeceras HTTP de la petición
 
             Enumeration<String> headerNames = req.getHeaderNames();
             while (headerNames.hasMoreElements()) {
