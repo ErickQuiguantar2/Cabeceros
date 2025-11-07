@@ -34,36 +34,53 @@ public class ProductoXlsServlet extends HttpServlet {
      * en una tabla HTML.
      */
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ProductoServicios service = new ProductosServiceImpl();
+        List<Producto> productos = service.listar();
 
-        ProductoServicios servicio = new ProductosServiceImpl();
-        List<Producto> productos = servicio.listar();
-
-        // Configurar el tipo de contenido para Excel
-        resp.setContentType("application/vnd.ms-excel");
-        // Forzar descarga con un nombre de archivo
-        resp.setHeader("Content-Disposition", "attachment; filename=productos.xls");
-
+        resp.setContentType("text/html;charset=UTF-8");
+        String servletPath=req.getServletPath();
+        boolean esXls=servletPath.endsWith(".xls");
+        if (esXls){
+            resp.setContentType("application/vnd.ms-excel");
+            resp.setHeader("Content-Disposition", "attachment; filename=productos.xls");
+        }
         try (PrintWriter out = resp.getWriter()) {
-            // Generar contenido tipo tabla HTML que Excel puede abrir
-            out.println("<table border='1'>");
-            out.println("<tr>");
-            out.println("<th>ID Producto</th>");
-            out.println("<th>Nombre</th>");
-            out.println("<th>Tipo</th>");
-            out.println("<th>Precio</th>");
-            out.println("</tr>");
-            for (Producto p : productos) {
-                out.println("<tr>");
-                out.println("<td>" + p.getIdProducto() + "</td>");
-                out.println("<td>" + p.getNombre() + "</td>");
-                out.println("<td>" + p.getTipo() + "</td>");
-                out.println("<td>" + p.getPrecio() + "</td>");
-                out.println("</tr>");
+            if (!esXls) {
+                //Creo la plantilla html
+                out.print("<!DOCTYPE html>");
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<meta charset=\"utf-8\">");
+                out.println("<title>Listado dre Productos</title>");
+                out.println("</head>");
+                out.println("<body>");
+                out.println("<h1>Listado de productos</h1>");
+                out.println("<p><a href=\"" + req.getContextPath() + "/producto.xls" + "\">exportar a excel</a></p>");
+                out.println("<p><a href=\"" + req.getContextPath() + "/productojson" + "\">mostrar json</a></p>");
             }
+
+            out.println("<table>");
+            out.println("<tr>");
+            out.println("<th>id</th>");
+            out.println("<th>nombre</th>");
+            out.println("<th>tipo</th>");
+            out.println("<th>precio</th>");
+            out.println("</tr>");
+            productos.forEach(p->{
+                out.println("<tr>");
+                out.println("<td>"+p.getId()+"</td>");
+                out.println("<td>"+p.getNombre()+"</td>");
+                out.println("<td>"+p.getTipo()+"</td>");
+                out.println("<td>"+p.getPrecio()+"</td>");
+                out.println("</tr>");
+            });
             out.println("</table>");
+            if (!esXls) {
+                out.println("</body>");
+                out.println("</html>");
+            }
+
         }
     }
 }
